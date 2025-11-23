@@ -1,0 +1,19 @@
+# .gitignore
+*.pyc
+__pycache__/
+.env
+.DS_Store
+.vscode/
+.idea/
+core-telecoms-venv/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+
+# Sensitive
+service_account.json
+*.pem
+secrets/
