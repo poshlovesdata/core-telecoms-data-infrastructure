@@ -14,7 +14,8 @@ core-telecoms-venv/
 .terraform.lock.hcl
 
 # Sensitive
-service_account.json
+google_service_account.json
 *.pem
 secrets/
 secrets.json
+airflow/config/airflow.cfg
