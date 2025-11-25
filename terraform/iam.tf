@@ -33,3 +33,52 @@ resource "aws_iam_policy" "airflow_policy" {
     ]
   })
 }
+
+# Production Identity
+# To be used if airflow gets deployed to production (EC2)
+data "aws_iam_policy_document" "airflow_ec2_trust" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "airflow_execution_role" {
+  name = "airflow_execution_role"
+
+  assume_role_policy = data.aws_iam_policy_document.airflow_ec2_trust.json
+
+  tags = {
+    Purpose = "Airflow Production Execution"
+    Owner   = "DataEngineering"
+  }
+}
+
+# Attach Policy to role
+resource "aws_iam_role_policy_attachment" "role_attach" {
+  role       = aws_iam_role.airflow_execution_role.name
+  policy_arn = aws_iam_policy.airflow_policy.arn
+}
+
+# Local Airflow Identity
+# To be used for local airflow development
+resource "aws_iam_user" "airflow_local_user" {
+  name = "airflow_local_dev"
+
+  tags = {
+    Purpose = "Local Development"
+  }
+}
+
+resource "aws_iam_user_policy_attachment" "user_attach" {
+  user       = aws_iam_user.airflow_local_user.name
+  policy_arn = aws_iam_policy.airflow_policy.arn
+}
+
+
+resource "aws_iam_access_key" "airflow_local_key" {
+  user = aws_iam_user.airflow_local_user.name
+}
