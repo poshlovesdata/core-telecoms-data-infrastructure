@@ -17,3 +17,4 @@ core-telecoms-venv/
 service_account.json
 *.pem
 secrets/
+secrets.json
