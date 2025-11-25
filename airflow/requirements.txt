@@ -1,0 +1,12 @@
+# AWS and Snowflake Providers
+apache-airflow-providers-amazon
+apache-airflow-providers-snowflake
+apache-airflow-providers-google
+
+# Data process
+pandas>=2.0.0
+pyarrow>=14.0.0
+
+# Utilities
+psycopg2-binary>=2.9.0
+python-dotenv>=1.0.0
