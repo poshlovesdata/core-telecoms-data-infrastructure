@@ -6,7 +6,9 @@ __pycache__/
 .vscode/
 .idea/
 core-telecoms-venv/
-
+*.csv
+*.log
+logs/
 # Terraform
 .terraform/
 *.tfstate
@@ -19,3 +21,8 @@ google_service_account.json
 secrets/
 secrets.json
 airflow/config/airflow.cfg
+s3_script2.py
+s3_script.py
+quick_classes_tut.py
+media_complaint_day_2025-11-20.json
+agent
