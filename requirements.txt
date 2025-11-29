@@ -1,1 +1,4 @@
 pre_commit==4.5.0
+boto3
+moto
+python-dotenv
