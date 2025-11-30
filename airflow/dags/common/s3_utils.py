@@ -26,6 +26,7 @@ class S3Ingestor:
                 aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
                 region_name=os.getenv("AWS_DEFAULT_REGION"),
             )
+            logger.info("Successfully initialized S3")
         except Exception as e:
             logger.error("Failed to initialize AWS S3")
             raise e
@@ -38,6 +39,7 @@ class S3Ingestor:
 
         def clean_column(col_name):
             # Lowercase, strip whitespace, replace spaces/special chars with underscore
+            logger.info(f"Cleaning column {col_name}")
             return re.sub(r"[^a-zA-Z0-9]", "_", str(col_name).strip().lower())
 
         df.columns = [clean_column(c) for c in df.columns]
@@ -56,17 +58,18 @@ class S3Ingestor:
 
             # Add column for ingestion time
             df["ingested_at"] = datetime.now()
+            logger.info("Successfully included ingested_at column")
 
             # Standardize column names for parquet
             df = self._standardize_columns(df)
+            print(df.head(10))
 
             # Convert to parquet
+            logger.info("Converting CSV to Parquet")
             out_buffer = BytesIO()
             df.to_parquet(
                 out_buffer, index=False, engine="pyarrow", compression="snappy"
             )
-
-            print(df.head(10))
 
             # Upload
             self.s3_client.put_object(
@@ -75,7 +78,7 @@ class S3Ingestor:
 
             s3_path = f"s3://{self.bucket_name}/{s3_key}"
             logger.info(
-                f"Uploaded {len(df)} rows to {s3_path} (Cols: {list(df.columns)})"
+                f"Uploaded parquet with {len(df)} rows to {s3_path} (Cols: {list(df.columns)})"
             )
             return s3_path
         except Exception as e:

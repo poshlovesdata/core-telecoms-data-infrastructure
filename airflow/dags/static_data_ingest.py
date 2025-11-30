@@ -1,9 +1,6 @@
 # from pendulum import datetime
 from datetime import datetime, timedelta
 from airflow.sdk import dag, task
-from airflow.providers.google.suite.operators.sheets import (
-    GoogleSheetsCreateSpreadsheetOperator,
-)
 from airflow.providers.google.suite.hooks.sheets import GSheetsHook
 from typing import Final
 import boto3
@@ -11,9 +8,9 @@ import os
 import logging
 import pandas as pd
 from dotenv import load_dotenv
-from io import BytesIO
 import re
 from common.s3_utils import S3Ingestor
+import time
 
 load_dotenv()
 
@@ -23,8 +20,8 @@ aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID")
 aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
 region_name = os.getenv("AWS_DEFAULT_REGION")
 
-# sheet_id_env: str | None = os.getenv('GOOGLE_SHEET_ID')
-sheet_id_env: str | None = "17IXo7TjDSSHaFobGG9hcqgbsNKTaqgyctWGnwDeNkIQ"
+sheet_id_env: str | None = os.getenv("GOOGLE_SHEET_ID")
+# sheet_id_env: str | None = "17IXo7TjDSSHaFobGG9hcqgbsNKTaqgyctWGnwDeNkIQ"
 
 # GOOGLE_SHEET_ID = '17IXo7TjDSSHaFobGG9hcqgbsNKTaqgyctWGnwDeNkIQ'
 
@@ -64,12 +61,71 @@ def ingest_google_sheets():
 
         df.columns = [clean(c) for c in df.columns]
 
-        # print(df.head(10))
-
+        # Instatiate S3 Ingestor Class
         ingestor = S3Ingestor(DEST_RAW_BUCKET)
         ingestor.upload_df_to_s3(df, "agents/agents.parquet")
 
+    @task
+    def extract_customers_s3():
+        """
+        Ingest static customers.csv from S3 Source.
+        """
+        logger = logging.getLogger("airflow.task")
+        s3 = boto3.client(
+            "s3",
+            aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+            aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+            region_name=os.getenv("AWS_DEFAULT_REGION"),
+        )
+        source_key = "customers/customers_dataset.csv"
+        local_file = "/tmp/customers_temp.csv"
+
+        logger.info(f"Starting download from S3://{SOURCE_RAW_BUCKET}/{source_key}")
+        start_time = time.time()
+        file_size = 0
+
+        try:
+            # Download to tmp file
+            s3.download_file(
+                Bucket=SOURCE_RAW_BUCKET, Key=source_key, Filename=local_file
+            )
+
+            duration = time.time() - start_time
+            file_size = os.path.getsize(local_file) / (1024 * 1024)  # MB
+            logger.info(
+                f"Download complete: {file_size:.2f}MB in {duration:.2f} seconds"
+            )
+
+            try:
+                # Read with PyArrow Engine
+                logger.info(f"Parsing CSV with PyArrow")
+                df = pd.read_csv(local_file, engine="pyarrow")
+                logger.info(f"Parsed {len(df)} rows.")
+            except Exception as e:
+                logger.warning(f"PyArrow Engine failed: {e}")
+                logger.info(f"Falling back to C engine")
+                # Read CSV with default engine
+                df = pd.read_csv(
+                    local_file,
+                    engine="c",
+                    on_bad_lines="warn",
+                    quotechar='"',
+                    escapechar="\\",
+                )
+                logger.info(f"Succesfully parsed CSV. Row Count: {len(df)}")
+
+            # Upload to Raw Zone
+            ingestor = S3Ingestor(DEST_RAW_BUCKET)
+            ingestor.upload_df_to_s3(
+                df=df, s3_key="customers/customers_dataset.parquet"
+            )
+        finally:
+            if os.path.exists(local_file):
+                os.remove(local_file)
+                logger.info(f"Cleared temp file: {local_file} : {file_size:.2f}MB")
+
     extract_agent_sheet()
+    extract_customers_s3()
 
 
 dag = ingest_google_sheets()
