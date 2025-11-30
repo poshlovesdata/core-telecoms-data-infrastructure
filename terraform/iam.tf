@@ -18,6 +18,10 @@ resource "aws_iam_policy" "airflow_policy" {
           "arn:aws:s3:::${local.common_prefix}-raw/*",
           "arn:aws:s3:::${local.common_prefix}-curated",
           "arn:aws:s3:::${local.common_prefix}-curated/*",
+
+          "arn:aws:s3:::core-telecoms-data-lake",
+          "arn:aws:s3:::core-telecoms-data-lake/*",
+          "arn:aws:s3:::core-telecoms-data-lake/customers/*",
         ]
       },
       # Access to SSM Parameters
