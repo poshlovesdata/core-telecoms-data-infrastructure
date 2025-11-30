@@ -27,7 +27,8 @@ sheet_id_env: str | None = os.getenv("GOOGLE_SHEET_ID")
 
 default_args = {
     "owner": "data_engineering",
-    "retries": 1,
+    "retries": 2,
+    "retry_delay": timedelta(minutes=5),
 }
 
 
