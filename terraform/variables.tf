@@ -16,3 +16,17 @@ variable "environment" {
   default     = "dev"
 
 }
+
+variable "snowflake_account_arn" {
+  description = "STORAGE_AWS_IAM_USER_ARN from Snowflake DESC INTEGRATION"
+  type        = string
+  default     = "arn:aws:iam::714551764970:user/rso71000-s" # Placeholder beofre getting real values
+
+}
+
+variable "snowflake_external_id" {
+  description = "STORAGE_AWS_EXTERNAL_ID from Snowflake DESC INTEGRATION"
+  type        = string
+  default     = "VN34785_SFCRole=4_2TpdZPUJpJ2Rkb2hWp9wJZQYRfM=" # Placeholder beofre getting real values
+
+}

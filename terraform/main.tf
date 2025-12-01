@@ -20,6 +20,7 @@ module "vpc" {
 
 locals {
   common_prefix = "${var.project_name}-${var.environment}"
+  bucket_name   = "cde-${var.project_name}-data-lake"
   common_tags = {
     Project            = var.project_name
     Environment        = var.environment
@@ -28,21 +29,23 @@ locals {
 }
 
 # S3 buckets for storage
-resource "aws_s3_bucket" "raw_layer" {
-  bucket = "${local.common_prefix}-raw"
+# This bucket hosts both 'raw/' and 'curated/' prefixes
+resource "aws_s3_bucket" "data_lake" {
+  bucket        = local.bucket_name
+  force_destroy = false
 
-  tags = merge(local.common_tags, { Layer = "Raw" })
+  tags = merge(local.common_tags, { Layer = "DataLake" })
 }
 
-resource "aws_s3_bucket_versioning" "raw_versioning" {
-  bucket = aws_s3_bucket.raw_layer.id
+resource "aws_s3_bucket_versioning" "lake_versioning" {
+  bucket = aws_s3_bucket.data_lake.id
   versioning_configuration {
     status = "Enabled"
   }
 }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "raw_encryption" {
-  bucket = aws_s3_bucket.raw_layer.id
+resource "aws_s3_bucket_server_side_encryption_configuration" "lake_encryption" {
+  bucket = aws_s3_bucket.data_lake.id
 
   rule {
     apply_server_side_encryption_by_default {
@@ -51,41 +54,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "raw_encryption" {
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "raw_block" {
-  bucket = aws_s3_bucket.raw_layer.id
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-# Curated layer
-resource "aws_s3_bucket" "curated_layer" {
-  bucket = "${local.common_prefix}-curated"
-
-  tags = merge(local.common_tags, { Layer = "Curated" })
-}
-
-resource "aws_s3_bucket_versioning" "curated_versioning" {
-  bucket = aws_s3_bucket.curated_layer.id
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "curated_encryption" {
-  bucket = aws_s3_bucket.curated_layer.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
-
-resource "aws_s3_bucket_public_access_block" "curated_block" {
-  bucket = aws_s3_bucket.curated_layer.id
+resource "aws_s3_bucket_public_access_block" "lake_block" {
+  bucket = aws_s3_bucket.data_lake.id
 
   block_public_acls       = true
   block_public_policy     = true
