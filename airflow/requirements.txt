@@ -2,6 +2,7 @@
 apache-airflow-providers-amazon
 apache-airflow-providers-snowflake
 apache-airflow-providers-google
+apache-airflow-providers-postgres
 
 # Data process
 pandas>=2.0.0
