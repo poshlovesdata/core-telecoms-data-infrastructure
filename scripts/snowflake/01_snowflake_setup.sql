@@ -26,7 +26,7 @@ GRANT ALL ON SCHEMA core_telecom.curated TO ROLE core_data_engineering;
 
 -- Create the Service User (for Airflow)
 CREATE USER IF NOT EXISTS airflow_user
-PASSWORD = 'coreTelAirflow!3'
+PASSWORD = 'XXXXXX'
 DEFAULT_ROLE = core_data_engineering
 DEFAULT_WAREHOUSE = core_telecom_warehouse;
 

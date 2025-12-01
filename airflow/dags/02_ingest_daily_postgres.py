@@ -27,7 +27,7 @@ default_args = {
 def ingest_postgres_data():
     @task
     def extract_web_forms():
-        """ "
+        """
         Extracts data from dynamic table: web_form_request_YYYY_MM_DD
         """
         logger = logging.getLogger("airflow.task")

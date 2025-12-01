@@ -14,16 +14,14 @@ import time
 
 load_dotenv()
 
-DEST_RAW_BUCKET = "core-telecoms-dev-raw"
-SOURCE_RAW_BUCKET = "core-telecoms-data-lake"
-aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID")
-aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
-region_name = os.getenv("AWS_DEFAULT_REGION")
+DEST_RAW_BUCKET = os.getenv("DEST_RAW_BUCKET")
+SOURCE_RAW_BUCKET = os.getenv("SOURCE_RAW_BUCKET")
+GOOGLE_SHEET_ID = os.getenv("GOOGLE_SHEET_ID")
 
-sheet_id_env: str | None = os.getenv("GOOGLE_SHEET_ID")
-# sheet_id_env: str | None = "17IXo7TjDSSHaFobGG9hcqgbsNKTaqgyctWGnwDeNkIQ"
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+AWS_DEFAULT_REGION = os.getenv("AWS_DEFAULT_REGION")
 
-# GOOGLE_SHEET_ID = '17IXo7TjDSSHaFobGG9hcqgbsNKTaqgyctWGnwDeNkIQ'
 
 default_args = {
     "owner": "data_engineering",
@@ -42,13 +40,7 @@ default_args = {
 def ingest_google_sheets():
     @task
     def extract_agent_sheet():
-        if sheet_id_env is None:
-            raise ValueError(
-                "Environment variable GOOGLE_SHEET_ID must be set and non-empty."
-            )
-
         hook = GSheetsHook(gcp_conn_id="google_cloud_conn")
-        GOOGLE_SHEET_ID: Final[str] = sheet_id_env
         values = hook.get_values(spreadsheet_id=GOOGLE_SHEET_ID, range_="agents")
 
         if not values:
@@ -74,9 +66,9 @@ def ingest_google_sheets():
         logger = logging.getLogger("airflow.task")
         s3 = boto3.client(
             "s3",
-            aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-            aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-            region_name=os.getenv("AWS_DEFAULT_REGION"),
+            aws_access_key_id=AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+            region_name=AWS_DEFAULT_REGION,
         )
         source_key = "customers/customers_dataset.csv"
         local_file = "/tmp/customers_temp.csv"
