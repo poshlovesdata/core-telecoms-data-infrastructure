@@ -9,3 +9,8 @@ output "airflow_iam_access_secret_key" {
   value       = aws_iam_access_key.airflow_local_key.secret
   sensitive   = true
 }
+
+output "snowflake_role_arn" {
+  description = "ARN of the Snowflake Access Role (Use this in CREATE STORAGE INTEGRATION)"
+  value       = aws_iam_role.snowflake_s3_role.arn
+}
