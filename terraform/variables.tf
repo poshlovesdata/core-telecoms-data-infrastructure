@@ -27,6 +27,6 @@ variable "snowflake_account_arn" {
 variable "snowflake_external_id" {
   description = "STORAGE_AWS_EXTERNAL_ID from Snowflake DESC INTEGRATION"
   type        = string
-  default     = "VN34785_SFCRole=4_2TpdZPUJpJ2Rkb2hWp9wJZQYRfM=" # Placeholder beofre getting real values
+  default     = "VN34785_SFCRole=4_p17yMlVg46U8LmqKfS/vgyj7KhA=" # Placeholder beofre getting real values
 
 }

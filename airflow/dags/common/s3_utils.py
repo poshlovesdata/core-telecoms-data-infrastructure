@@ -57,7 +57,7 @@ class S3Ingestor:
                 )
 
             # Add column for ingestion time
-            df["ingested_at"] = datetime.now()
+            df["_ingested_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             logger.info("Successfully included ingested_at column")
 
             # Standardize column names for parquet
