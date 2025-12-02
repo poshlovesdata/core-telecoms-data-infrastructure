@@ -1,0 +1,113 @@
+from datetime import datetime, timedelta
+from airflow.sdk import dag, task
+from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
+
+# from airflow.providers.snowflake.operators.snowflake
+
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
+default_args = {
+    "owner": "data_engineering",
+    "retries": 2,
+    "retry_delay": timedelta(minutes=5),
+}
+
+
+@dag(
+    dag_id="04_load_raw_snowflake",
+    default_args=default_args,
+    schedule="@daily",
+    start_date=datetime(2025, 11, 20),
+    catchup=True,
+    tags=["loading", "snowflake", "raw"],
+)
+def load_raw_data():
+    # Load Static Data (Agents)
+    load_agents = SQLExecuteQueryOperator(
+        conn_id="snowflake_default",
+        task_id="load_agents",
+        sql="""
+                                        USE DATABASE core_telecom;
+                                        USE SCHEMA raw;
+                                        BEGIN;
+                                        TRUNCATE TABLE raw.agents;
+                                        COPY INTO raw.agents
+                                        FROM @raw.coretelecom_s3_stage/agents/
+                                        FILE_FORMAT = (FORMAT_NAME = 'parquet_format')
+                                        MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE
+                                        PATTERN = '.*parquet';
+                                        COMMIT;
+                                          """,
+    )
+    # Load Static Data (Customers)
+    load_customers = SQLExecuteQueryOperator(
+        task_id="load_customers",
+        conn_id="snowflake_default",
+        sql="""
+            USE DATABASE core_telecom;
+            USE SCHEMA raw;
+            BEGIN;
+            TRUNCATE TABLE customers;
+            COPY INTO customers
+            FROM @raw.coretelecom_s3_stage/customers/
+            FILE_FORMAT = (FORMAT_NAME = 'parquet_format')
+            MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE
+            PATTERN = '.*parquet';
+            COMMIT;
+        """,
+    )
+
+    # Load Dynamic Data (Web Forms)
+    load_web_forms = SQLExecuteQueryOperator(
+        task_id="load_web_forms",
+        conn_id="snowflake_default",
+        sql="""
+            USE DATABASE core_telecom;
+            USE SCHEMA raw;
+            COPY INTO web_forms
+            FROM @raw.coretelecom_s3_stage/web_forms/{{ logical_date.strftime('%Y') }}/{{ logical_date.strftime('%m') }}/{{ logical_date.strftime('%d') }}/
+            FILE_FORMAT = (FORMAT_NAME = 'parquet_format')
+            MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE
+            ON_ERROR = CONTINUE;
+        """,
+    )
+
+    # Load Dynamic Data (Call Logs)
+    load_call_logs = SQLExecuteQueryOperator(
+        task_id="load_call_logs",
+        conn_id="snowflake_default",
+        sql="""
+            USE DATABASE core_telecom;
+            USE SCHEMA raw;
+            COPY INTO call_logs
+            FROM @raw.coretelecom_s3_stage/call_logs/{{ logical_date.strftime('%Y') }}/{{ logical_date.strftime('%m') }}/{{ logical_date.strftime('%d') }}/
+            FILE_FORMAT = (FORMAT_NAME = 'parquet_format')
+            MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE
+            ON_ERROR = CONTINUE;
+        """,
+    )
+
+    # Load Dynamic Data (Social Media)
+    load_social_media = SQLExecuteQueryOperator(
+        task_id="load_social_media",
+        conn_id="snowflake_default",
+        sql="""
+            USE DATABASE core_telecom;
+            USE SCHEMA raw;
+            COPY INTO social_media
+            FROM @raw.coretelecom_s3_stage/social_media/{{ logical_date.strftime('%Y') }}/{{ logical_date.strftime('%m') }}/{{ logical_date.strftime('%d') }}/
+            FILE_FORMAT = (FORMAT_NAME = 'parquet_format')
+            MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE
+            ON_ERROR = CONTINUE;
+        """,
+    )
+
+    # Parallel Execution
+    # [load_agents, load_customers, load_web_forms]
+    [load_agents, load_customers, load_web_forms, load_call_logs, load_social_media]
+
+
+dag = load_raw_data()

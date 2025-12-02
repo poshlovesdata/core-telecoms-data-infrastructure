@@ -1,13 +1,6 @@
 from airflow.sdk import dag, task
-from airflow.providers.postgres.hooks.postgres import PostgresHook
-import pandas as pd
 from datetime import datetime, timedelta
-import logging
-from airflow.sdk import get_current_context
-
-from common.s3_utils import S3Ingestor
-
-DEST_RAW_BUCKET = "core-telecoms-dev-raw"
+import os
 
 default_args = {
     "owner": "data_engineering",
@@ -30,7 +23,16 @@ def ingest_postgres_data():
         """
         Extracts data from dynamic table: web_form_request_YYYY_MM_DD
         """
+
+        import logging
+        from common.s3_utils import S3Ingestor
+        from dotenv import load_dotenv
+        from airflow.providers.postgres.hooks.postgres import PostgresHook
+        from airflow.sdk import get_current_context
+
+        load_dotenv()
         logger = logging.getLogger("airflow.task")
+        DEST_RAW_BUCKET = os.getenv("DEST_RAW_BUCKET")
 
         # Get airflow context for runtime variables
 

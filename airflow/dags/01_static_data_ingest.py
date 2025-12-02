@@ -1,8 +1,6 @@
-# from pendulum import datetime
 from datetime import datetime, timedelta
 from airflow.sdk import dag, task
 from airflow.providers.google.suite.hooks.sheets import GSheetsHook
-from typing import Final
 import boto3
 import os
 import logging
