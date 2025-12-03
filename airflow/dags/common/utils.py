@@ -1,19 +1,9 @@
 import time
-from dotenv import load_dotenv
 import os
 from airflow.providers.smtp.operators.smtp import EmailOperator
-import boto3
+
 import logging
-from airflow.sdk import get_current_context
 from datetime import datetime
-
-load_dotenv()
-
-logger = logging.getLogger("airflow.task")
-
-AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-AWS_DEFAULT_REGION = os.getenv("AWS_DEFAULT_REGION")
 
 
 def task_failure_alert(context):
@@ -47,6 +37,16 @@ def task_failure_alert(context):
 
 def get_source_s3():
     """Helper functioon to get S3 Client"""
+    import boto3
+    from dotenv import load_dotenv
+
+    load_dotenv()
+
+    logger = logging.getLogger("airflow.task")
+
+    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+    AWS_DEFAULT_REGION = os.getenv("AWS_DEFAULT_REGION")
     logger.info(f"Connecting to S3 Client")
     return boto3.client(
         "s3",
@@ -58,6 +58,9 @@ def get_source_s3():
 
 def get_logical_date():
     """Get airflow context for runtime variables. this returns a date"""
+    from airflow.sdk import get_current_context
+
+    logger = logging.getLogger("airflow.task")
     try:
         context = get_current_context()
 

@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: raw_layer
+    database: core_telecom
+    schema: raw
+    tables:
+      - name: agents
+      - name: customers
+      - name: web_forms
+      - name: call_logs
+      - name: social_media
