@@ -1,0 +1,37 @@
+site_name: Core Telecoms Data Platform
+site_url: https://poshlovesdata.github.io/core-telecoms-data-infrastructure/
+repo_url: https://github.com/poshlovesdata/core-telecoms-data-infrastructure
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: teal
+      accent: purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: teal
+      accent: lime
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Architecture Decisions:
+      - 001 - Infrastructure: architecture_decisions/001_infrastructure_setup.md
+      - 002 - Compute & Security: architecture_decisions/002_compute_and_security.md
+      - 003 - Orchestration: architecture_decisions/003_orchestration_setup.md
+      - 004 - Static Ingestion: architecture_decisions/004_static_data_ingestion.md
+      - 005 - Dynamic Ingestion: architecture_decisions/005_dynamic_ingestion.md
+      - 006 - Loading: architecture_decisions/006_data_loading_snowflake.md
+      - 007 - Transformation: architecture_decisions/007_transformation_dbt.md
+      - 008 - CI/CD: architecture_decisions/008_cicd_automation.md

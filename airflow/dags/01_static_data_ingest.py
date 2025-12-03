@@ -1,19 +1,13 @@
 from datetime import datetime, timedelta
 from airflow.sdk import dag, task
 from airflow.providers.google.suite.hooks.sheets import GSheetsHook
-import boto3
+from common.utils import task_failure_alert
 import os
-import logging
-import pandas as pd
 import re
 import time
 
 
-default_args = {
-    "owner": "data_engineering",
-    "retries": 2,
-    "retry_delay": timedelta(minutes=5),
-}
+default_args = {"owner": "data_engineering", "on_failure_callback": task_failure_alert}
 
 
 @dag(
@@ -26,6 +20,8 @@ default_args = {
 def ingest_google_sheets():
     @task
     def extract_agent_sheet():
+        import pandas as pd
+
         from common.s3_utils import S3Ingestor
         from dotenv import load_dotenv
 
@@ -57,8 +53,11 @@ def ingest_google_sheets():
         """
         Ingest static customers.csv from S3 Source.
         """
+        import pandas as pd
+        import logging
         from common.s3_utils import S3Ingestor
         from dotenv import load_dotenv
+        import boto3
 
         load_dotenv()
 
