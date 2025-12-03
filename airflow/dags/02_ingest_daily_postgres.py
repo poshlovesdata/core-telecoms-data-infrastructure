@@ -40,7 +40,7 @@ def ingest_postgres_data():
             context = get_current_context()
 
             logical_date = context["logical_date"]  # type: ignore
-        except Exception as e:
+        except Exception:
             # Fallback for local testing (when no airflow context exists)
             logger.warning(
                 "No Airflow context found. Using datetime.now() for local test."

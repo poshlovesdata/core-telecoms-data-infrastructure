@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from airflow.sdk import dag, task
+from airflow.sdk import dag
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 
 # from airflow.providers.snowflake.operators.snowflake
