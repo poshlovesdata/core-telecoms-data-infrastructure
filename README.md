@@ -29,6 +29,11 @@ Sources ➡️ Ingestion (Airflow) ➡️ Data Lake (S3) ➡️ Warehouse (Snowf
 - **Load:** Parquet files are loaded into Snowflake RAW tables via COPY INTO.
 - **Transform:** dbt models clean (Bronze), join (Silver), and aggregate (Gold) data.
 
+### Live Execution Graph (Event-Driven)
+
+![Alt text](docs/images/image.png)
+This pipeline uses Airflow Assets (Data-Aware Scheduling) instead of brittle time-based dependencies. The Transformation layer only runs once the Snowflake data is confirmed loaded.
+
 ## Tech Stack & Decisions
 
 | Component      | Technology         | Senior Engineering Decision                                                               |

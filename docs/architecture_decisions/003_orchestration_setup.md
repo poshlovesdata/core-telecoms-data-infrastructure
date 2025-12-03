@@ -38,6 +38,42 @@ The architecture prioritizes **Developer Experience (DevEx)** and **Resource Eff
 
 - **Security Measure:** Added `.env` and `secrets/*.json` to `.gitignore`.
 
+### D. Scheduling Strategy: Event-Driven (Assets)
+
+- **Context:** The pipeline consists of dependent stages (Ingest -> Load -> Transform).
+
+- **Challenge:** Using time-based scheduling (e.g., all DAGs running `@daily` at 7 AM) creates race conditions. If Ingestion is slow, the Loading DAG might start processing empty/old data.
+
+- **Decision:** Implemented Data-Aware Scheduling (Airflow Assets).
+
+- **Mechanism:**
+
+  - **Producers:** Ingestion DAGs define `outlets=[Asset("s3://...")]` to signal completion.
+
+  - **Consumers:** Downstream DAGs (Load/Transform) define `schedule=[Asset("...")]` to wake up only when the upstream data is ready.
+
+  - **Impact:** Eliminates race conditions and ensures the Transformation layer never runs until the Snowflake Loading is confirmed complete.
+
+### E. Observability: Real-Time Alerts (Slack)
+
+- **Context:** Pipeline failures must be detected immediately to prevent data freshness delays.
+
+- **Options:**
+
+  - **SMTP (Email):** Traditional, verbose, requires managing App Passwords and SMTP host configuration.
+
+  - **Slack Webhook:** Instant, team-centric, simpler authentication via tokens.
+
+  - **Decision:** Selected Slack Integration via `on_failure_callback`.
+
+- **Implementation:**
+
+  - Created a shared utility common.utils.task_failure_alert.
+
+  - Uses `SlackAPIPostOperator` (Bot Token Auth) to send formatted blocks containing the specific Task ID, DAG ID, and Log URL.
+
+- **Justification:** Slack provides faster "Time to Detect" (TTD) than email. Using a Bot Token allows for granular permission scopes (`chat:write`) compared to a broad webhook, and integrates seamlessly with Airflow connections.
+
 ## 3. Infrastructure Components
 
 | Service       | Role                | Configuration                                           |

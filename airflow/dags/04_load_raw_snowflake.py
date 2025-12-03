@@ -1,13 +1,17 @@
 from datetime import datetime, timedelta
-from airflow.sdk import dag
+from airflow.sdk import dag, Asset
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
-
-# from airflow.providers.snowflake.operators.snowflake
-
+import os
 from dotenv import load_dotenv
 
-
 load_dotenv()
+
+# Define Inputs (From Ingestion DAGs)
+DEST_RAW_BUCKET = os.getenv("DEST_RAW_BUCKET")
+POSTGRES_ASSET = Asset(f"s3://{DEST_RAW_BUCKET}/postgres")
+S3_SOURCE_ASSET = Asset(f"s3://{DEST_RAW_BUCKET}/s3_source")
+# Define Output (For Transformation DAG)
+SNOWFLAKE_RAW_ASSET = Asset("snowflake://cde-core-telecom-data-lake/raw")
 
 default_args = {
     "owner": "data_engineering",
@@ -19,7 +23,7 @@ default_args = {
 @dag(
     dag_id="04_load_raw_snowflake",
     default_args=default_args,
-    schedule="@daily",
+    schedule=[POSTGRES_ASSET, S3_SOURCE_ASSET],
     start_date=datetime(2025, 11, 20),
     catchup=True,
     tags=["loading", "snowflake", "raw"],
@@ -66,6 +70,7 @@ def load_raw_data():
     load_web_forms = SQLExecuteQueryOperator(
         task_id="load_web_forms",
         conn_id="snowflake_default",
+        outlets=[SNOWFLAKE_RAW_ASSET],
         sql="""
             USE DATABASE core_telecom;
             USE SCHEMA raw;
@@ -82,6 +87,7 @@ def load_raw_data():
     load_call_logs = SQLExecuteQueryOperator(
         task_id="load_call_logs",
         conn_id="snowflake_default",
+        outlets=[SNOWFLAKE_RAW_ASSET],
         sql="""
             USE DATABASE core_telecom;
             USE SCHEMA raw;
@@ -98,6 +104,7 @@ def load_raw_data():
     load_social_media = SQLExecuteQueryOperator(
         task_id="load_social_media",
         conn_id="snowflake_default",
+        outlets=[SNOWFLAKE_RAW_ASSET],
         sql="""
             USE DATABASE core_telecom;
             USE SCHEMA raw;
