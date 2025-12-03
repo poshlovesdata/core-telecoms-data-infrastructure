@@ -15,6 +15,7 @@ x-airflow-common: &airflow-common
     AIRFLOW__CORE__EXECUTION_API_SERVER_URL: "http://airflow-apiserver:8080/execution/"
     AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: "true"
     TZ: Africa/Lagos
+    AIRFLOW__CORE__TEST_CONNECTION: Enabled
 
     # The following line can be used to set a custom config file, stored in the local config folder
     AIRFLOW_CONFIG: "/opt/airflow/config/airflow.cfg"
@@ -30,6 +31,8 @@ x-airflow-common: &airflow-common
 
     AIRFLOW_CONN_SNOWFLAKE_DEFAULT: ${AIRFLOW_CONN_SNOWFLAKE_DEFAULT}
     AIRFLOW_CONN_AWS_DEFAULT: aws://${AWS_ACCESS_KEY_ID}:${AWS_SECRET_ACCESS_KEY}@?region_name=${AWS_DEFAULT_REGION}
+    AIRFLOW_CONN_SMTP_DEFAULT: ${AIRFLOW_CONN_SMTP_DEFAULT}
+    AIRFLOW_CONN_SLACK_DEFAULT: ${AIRFLOW_CONN_SLACK_DEFAULT}
   volumes:
     - ./dags:/opt/airflow/dags
     - ./logs:/opt/airflow/logs
