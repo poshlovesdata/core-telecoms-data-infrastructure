@@ -39,6 +39,7 @@ def load_raw_data():
                                         FILE_FORMAT = (FORMAT_NAME = 'parquet_format')
                                         MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE
                                         PATTERN = '.*parquet';
+                                        UPDATE agents SET _loaded_at = CURRENT_TIMESTAMP() WHERE _loaded_at IS NULL;
                                         COMMIT;
                                           """,
     )
@@ -56,6 +57,7 @@ def load_raw_data():
             FILE_FORMAT = (FORMAT_NAME = 'parquet_format')
             MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE
             PATTERN = '.*parquet';
+            UPDATE customers SET _loaded_at = CURRENT_TIMESTAMP() WHERE _loaded_at IS NULL;
             COMMIT;
         """,
     )
@@ -72,6 +74,7 @@ def load_raw_data():
             FILE_FORMAT = (FORMAT_NAME = 'parquet_format')
             MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE
             ON_ERROR = CONTINUE;
+            UPDATE web_forms SET _loaded_at = CURRENT_TIMESTAMP() WHERE _loaded_at IS NULL;
         """,
     )
 
@@ -87,6 +90,7 @@ def load_raw_data():
             FILE_FORMAT = (FORMAT_NAME = 'parquet_format')
             MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE
             ON_ERROR = CONTINUE;
+            UPDATE call_logs SET _loaded_at = CURRENT_TIMESTAMP() WHERE _loaded_at IS NULL;
         """,
     )
 
@@ -102,6 +106,7 @@ def load_raw_data():
             FILE_FORMAT = (FORMAT_NAME = 'parquet_format')
             MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE
             ON_ERROR = CONTINUE;
+            UPDATE social_media SET _loaded_at = CURRENT_TIMESTAMP() WHERE _loaded_at IS NULL;
         """,
     )
 

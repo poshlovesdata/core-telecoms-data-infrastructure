@@ -26,3 +26,12 @@ s3_script.py
 quick_classes_tut.py
 media_complaint_day_2025-11-20.json
 agent
+
+
+# dbt
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+target/
+dbt_packages/
+logs/

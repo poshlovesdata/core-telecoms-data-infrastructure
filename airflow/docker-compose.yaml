@@ -37,6 +37,7 @@ x-airflow-common: &airflow-common
     - ./plugins:/opt/airflow/plugins
     # GCP Secrets mount
     - ./secrets/google_service_account.json:/opt/airflow/secrets/google_service_account.json
+    - ../dbt:/opt/airflow/dags/dbt
 
   user: "${AIRFLOW_UID}:0"
   depends_on: &airflow-common-depends-on

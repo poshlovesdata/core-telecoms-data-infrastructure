@@ -5,20 +5,8 @@ import boto3
 import os
 import logging
 import pandas as pd
-from dotenv import load_dotenv
 import re
-from common.s3_utils import S3Ingestor
 import time
-
-load_dotenv()
-
-DEST_RAW_BUCKET = os.getenv("DEST_RAW_BUCKET")
-SOURCE_RAW_BUCKET = os.getenv("SOURCE_RAW_BUCKET")
-GOOGLE_SHEET_ID = os.getenv("GOOGLE_SHEET_ID")
-
-AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-AWS_DEFAULT_REGION = os.getenv("AWS_DEFAULT_REGION")
 
 
 default_args = {
@@ -38,7 +26,15 @@ default_args = {
 def ingest_google_sheets():
     @task
     def extract_agent_sheet():
+        from common.s3_utils import S3Ingestor
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        DEST_RAW_BUCKET = os.getenv("DEST_RAW_BUCKET")
+        GOOGLE_SHEET_ID = os.getenv("GOOGLE_SHEET_ID")
         hook = GSheetsHook(gcp_conn_id="google_cloud_conn")
+
         values = hook.get_values(spreadsheet_id=GOOGLE_SHEET_ID, range_="agents")
 
         if not values:
@@ -61,6 +57,17 @@ def ingest_google_sheets():
         """
         Ingest static customers.csv from S3 Source.
         """
+        from common.s3_utils import S3Ingestor
+        from dotenv import load_dotenv
+
+        load_dotenv()
+
+        DEST_RAW_BUCKET = os.getenv("DEST_RAW_BUCKET")
+        SOURCE_RAW_BUCKET = os.getenv("SOURCE_RAW_BUCKET")
+        AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+        AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+        AWS_DEFAULT_REGION = os.getenv("AWS_DEFAULT_REGION")
+
         logger = logging.getLogger("airflow.task")
         s3 = boto3.client(
             "s3",
