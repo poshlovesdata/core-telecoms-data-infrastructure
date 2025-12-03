@@ -5,13 +5,15 @@ on:
     branches: [main]
 
 permissions:
-  contents: write
+  contents: write # Required for pushing to gh-pages branch
+  packages: write # Required if pushing to GHCR
 
 jobs:
+  # Job 1: Build and Push Docker Image
   build-and-push:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout
+      - uses: actions/checkout@v3
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2
@@ -19,7 +21,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Setup Docker Build
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
       - name: Build and push
@@ -27,10 +29,11 @@ jobs:
         with:
           context: ./airflow
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/coretelecoms-airflow:latest,${{ secrets.DOCKERHUB_USERNAME }}/cde-capstone-airflow:${{ github.sha }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/cde-capstone-airflow:latest,${{ secrets.DOCKERHUB_USERNAME }}/cde-capstone-airflow:${{ github.sha }}
 
-  deploy:
+  deploy-docs:
     runs-on: ubuntu-latest
+    # needs: build-and-push
     steps:
       - uses: actions/checkout@v3
 
