@@ -1,7 +1,5 @@
 import os
 from airflow.providers.slack.operators.slack import SlackAPIPostOperator
-
-from airflow.utils.email import send_email
 import logging
 from datetime import datetime
 
