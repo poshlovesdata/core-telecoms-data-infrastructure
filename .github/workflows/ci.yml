@@ -1,0 +1,68 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+jobs:
+  # Python Quality Check
+  python-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          pip install ruff
+
+      - name: Run Ruff linting
+        run: |
+          ruff check airflow/dags/
+
+  # Terraform Validation
+  terraform-validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./terraform
+    steps:
+      - uses: actions/checkout@v3
+      - uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Init
+        run: terraform init -backend=false
+
+      - name: Terraform Validate
+        run: terraform validate
+
+  # dbt Compile and SQL Check
+  dbt-compile:
+    runs-on: ubuntu-latest
+    env:
+      SNOWFLAKE_ACCOUNT: dummy_account
+      SNOWFLAKE_USER: dummy_user
+      SNOWFLAKE_PASSWORD: dummy_password
+      SNOWFLAKE_ROLE: dummy_role
+      SNOWFLAKE_WAREHOUSE: dummy_wh
+      SNOWFLAKE_DATABASE: dummy_db
+      SNOWFLAKE_SCHEMA: dummy_schema
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dbt
+        run: pip install dbt-snowflake
+
+      - name: dbt Deps
+        run: cd dbt && dbt deps --profiles-dir .
+
+      - name: dbt Compile
+        run: cd dbt && dbt compile ----profiles-dir .
