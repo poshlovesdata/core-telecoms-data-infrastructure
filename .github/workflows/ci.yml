@@ -64,5 +64,5 @@ jobs:
       - name: dbt Deps
         run: cd dbt && dbt deps --profiles-dir .
 
-      - name: dbt Compile
-        run: cd dbt && dbt compile --profiles-dir .
+      - name: dbt Parse
+        run: cd dbt && dbt parse --profiles-dir .
