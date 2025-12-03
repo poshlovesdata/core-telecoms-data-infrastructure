@@ -29,6 +29,10 @@ Sources ➡️ Ingestion (Airflow) ➡️ Data Lake (S3) ➡️ Warehouse (Snowf
 - **Load:** Parquet files are loaded into Snowflake RAW tables via COPY INTO.
 - **Transform:** dbt models clean (Bronze), join (Silver), and aggregate (Gold) data.
 
+### Live Execution Graph (Event-Driven)
+
+This pipeline uses Airflow Assets (Data-Aware Scheduling) instead of brittle time-based dependencies. The Transformation layer only runs once the Snowflake data is confirmed loaded.
+
 ## Tech Stack & Decisions
 
 | Component      | Technology         | Senior Engineering Decision                                                               |
@@ -127,9 +131,9 @@ Run tests manually:
 docker exec -it airflow-scheduler bash -c "cd dbt && dbt test"
 ```
 
-## ✍️ Author
+## Author
 
-**Your Name** – Data Platform Engineer
+**Oluwapelumi Oshundiya** – Data Platform Engineer
 LinkedIn | Portfolio
 
 _Built as a Capstone Project demonstrating Data Engineering competencies._

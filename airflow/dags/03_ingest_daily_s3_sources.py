@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from airflow.sdk import dag, task
+from airflow.sdk import dag, task, Asset
 import os
 import logging
 import pandas as pd
@@ -19,6 +19,8 @@ AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 AWS_DEFAULT_REGION = os.getenv("AWS_DEFAULT_REGION")
 
+S3_SOURCE_ASSET = Asset(f"s3://{DEST_RAW_BUCKET}/s3_source")
+
 default_args = {
     "owner": "data_engineering",
     "retries": 2,
@@ -37,7 +39,7 @@ default_args = {
 def ingest_daily_s3():
     logger = logging.getLogger("airflow.tasks")
 
-    @task
+    @task(outlets=[S3_SOURCE_ASSET])
     def ingest_call_center():
         """Ingest call logs data. call_logs_day_YYYY-MM-DD.csv"""
         s3 = get_source_s3()
@@ -70,7 +72,7 @@ def ingest_daily_s3():
         except s3.exceptions.NoSuchKey as e:
             logger.warning(f"{source_key} not found: {e}")
 
-    @task
+    @task(outlets=[S3_SOURCE_ASSET])
     def ingest_social_media():
         """Ingest social media. media_complaint_day_YYYY-MM-DD.json"""
         s3 = get_source_s3()

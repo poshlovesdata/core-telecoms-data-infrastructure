@@ -1,4 +1,4 @@
-from airflow.decorators import dag
+from airflow.sdk import dag, Asset
 from datetime import datetime, timedelta
 import os
 
@@ -6,6 +6,8 @@ import os
 DBT_PROJECT_DIR = "/opt/airflow/dags/dbt"
 # Define path where pip installed dbt
 DBT_BIN_DIR = "/home/airflow/.local/bin"
+
+SNOWFLAKE_RAW_ASSET = Asset("snowflake://cde-core-telecom-data-lake/raw")
 
 
 def get_dbt_env():
@@ -41,7 +43,7 @@ default_args = {
 @dag(
     dag_id="05_dbt_transformation",
     default_args=default_args,
-    schedule="@daily",
+    schedule=[SNOWFLAKE_RAW_ASSET],
     start_date=datetime(2025, 11, 20),
     catchup=False,
     tags=["transform", "dbt", "snowflake"],

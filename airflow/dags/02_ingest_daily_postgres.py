@@ -1,6 +1,13 @@
 from airflow.sdk import dag, task
 from datetime import datetime, timedelta
 import os
+from airflow.sdk import Asset
+
+
+DEST_RAW_BUCKET = os.getenv("DEST_RAW_BUCKET")
+
+# "When this URI is updated, trigger downstream DAGs"
+POSTGRES_ASSET = Asset(f"s3://{DEST_RAW_BUCKET}/postgres")
 
 default_args = {
     "owner": "data_engineering",
@@ -18,7 +25,7 @@ default_args = {
     tags=["ingestion", "daily", "dynamic", "postgres", "database"],
 )
 def ingest_postgres_data():
-    @task
+    @task(outlets=[POSTGRES_ASSET])
     def extract_web_forms():
         """
         Extracts data from dynamic table: web_form_request_YYYY_MM_DD
@@ -32,7 +39,6 @@ def ingest_postgres_data():
 
         load_dotenv()
         logger = logging.getLogger("airflow.task")
-        DEST_RAW_BUCKET = os.getenv("DEST_RAW_BUCKET")
 
         # Get airflow context for runtime variables
 
