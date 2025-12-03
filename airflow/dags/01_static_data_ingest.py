@@ -96,12 +96,12 @@ def ingest_google_sheets():
 
             try:
                 # Read with PyArrow Engine
-                logger.info(f"Parsing CSV with PyArrow")
+                logger.info("Parsing CSV with PyArrow")
                 df = pd.read_csv(local_file, engine="pyarrow")
                 logger.info(f"Parsed {len(df)} rows.")
             except Exception as e:
                 logger.warning(f"PyArrow Engine failed: {e}")
-                logger.info(f"Falling back to C engine")
+                logger.info("Falling back to C engine")
                 # Read CSV with default engine
                 df = pd.read_csv(
                     local_file,

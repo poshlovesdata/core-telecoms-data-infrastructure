@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 from airflow.sdk import dag, task
-import boto3
 import os
 import logging
 import pandas as pd
@@ -69,7 +68,7 @@ def ingest_daily_s3():
             )
             ingestor.upload_df_to_s3(df, destination_key)
         except s3.exceptions.NoSuchKey as e:
-            logger.warning(f"{source_key} not found")
+            logger.warning(f"{source_key} not found: {e}")
 
     @task
     def ingest_social_media():
@@ -96,7 +95,7 @@ def ingest_daily_s3():
             )
             ingestor.upload_df_to_s3(df, destination_key)
         except s3.exceptions.NoSuchKey as e:
-            logger.warning(f"{source_key} not found")
+            logger.warning(f"{source_key} not found: {e}")
 
     ingest_call_center()
     ingest_social_media()

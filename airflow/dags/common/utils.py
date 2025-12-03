@@ -1,4 +1,3 @@
-import time
 import os
 from airflow.providers.smtp.operators.smtp import EmailOperator
 
@@ -47,7 +46,7 @@ def get_source_s3():
     AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
     AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
     AWS_DEFAULT_REGION = os.getenv("AWS_DEFAULT_REGION")
-    logger.info(f"Connecting to S3 Client")
+    logger.info("Connecting to S3 Client")
     return boto3.client(
         "s3",
         aws_access_key_id=AWS_ACCESS_KEY_ID,
@@ -68,6 +67,8 @@ def get_logical_date():
         return logical_date
     except Exception as e:
         # Fallback for local testing (when no airflow context exists)
-        logger.warning("No Airflow context found. Using datetime.now() for local test.")
+        logger.warning(
+            f"No Airflow context found. Using datetime.now() for local test: {e}"
+        )
         logical_date = datetime.now()
         return logical_date
