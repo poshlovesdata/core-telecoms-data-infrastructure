@@ -62,7 +62,7 @@ jobs:
         run: pip install dbt-snowflake
 
       - name: dbt Deps
-        run: cd dbt && dbt deps --profiles-dir .
+        run: cd airflow/dbt && dbt deps --profiles-dir .
 
       - name: dbt Parse
-        run: cd dbt && dbt parse --profiles-dir .
+        run: cd airflow/dbt && dbt parse --profiles-dir .
