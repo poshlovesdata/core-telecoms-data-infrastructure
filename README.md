@@ -19,6 +19,26 @@ This project delivers a **Unified Data Platform** that:
 
 [Click here to view the full Architecture Decision Records & Documentation](https://poshlovesdata.github.io/core-telecoms-data-infrastructure/)
 
+### Architecture Decision Records (ADRs)
+
+Explore the detailed engineering decisions behind this platform:
+
+- [001 - Infrastructure Setup](./architecture_decisions/001_infrastructure_setup.md): Cloud foundation, networking, and security.
+
+- [002 - Compute & Security](./architecture_decisions/002_compute_and_security.md): Snowflake vs. Redshift and Identity Management.
+
+- [003 - Orchestration](./architecture_decisions/003_orchestration_setup.md): Airflow 3.0 configuration and event-driven scheduling.
+
+- [004 - Static Ingestion](./architecture_decisions/004_static_data_ingestion.md): Handling Google Sheets and messy CSVs.
+
+- [005 - Dynamic Ingestion](./architecture_decisions/005_dynamic_ingestion.md): Incremental extraction patterns for DBs and Logs.
+
+- [006 - Data Loading](./architecture_decisions/006_data_loading_snowflake.md): Secure Snowflake-S3 integration.
+
+- [007 - Transformation](./architecture_decisions/007_transformation_dbt.md): dbt Medallion architecture and data modeling.
+
+- [008 - CI/CD & Automation](./architecture_decisions/008_cicd_automation.md): DevOps pipelines and quality gates.
+
 ## Architecture
 
 ![Core Telecoms Architecture](docs/images/core-telecoms-dark.drawio.png)
