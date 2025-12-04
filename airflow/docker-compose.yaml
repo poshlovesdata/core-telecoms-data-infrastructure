@@ -32,15 +32,14 @@ x-airflow-common: &airflow-common
     AIRFLOW_CONN_SNOWFLAKE_DEFAULT: ${AIRFLOW_CONN_SNOWFLAKE_DEFAULT}
     AIRFLOW_CONN_AWS_DEFAULT: aws://${AWS_ACCESS_KEY_ID}:${AWS_SECRET_ACCESS_KEY}@?region_name=${AWS_DEFAULT_REGION}
     AIRFLOW_CONN_SMTP_DEFAULT: ${AIRFLOW_CONN_SMTP_DEFAULT}
-    AIRFLOW_CONN_SLACK_DEFAULT: ${AIRFLOW_CONN_SLACK_DEFAULT}
   volumes:
     - ./dags:/opt/airflow/dags
     - ./logs:/opt/airflow/logs
     - ./config:/opt/airflow/config
     - ./plugins:/opt/airflow/plugins
+    - ./dbt:/opt/airflow/dags/dbt
     # GCP Secrets mount
     - ./secrets/google_service_account.json:/opt/airflow/secrets/google_service_account.json
-    - ../dbt:/opt/airflow/dags/dbt
 
   user: "${AIRFLOW_UID}:0"
   depends_on: &airflow-common-depends-on
