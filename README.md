@@ -17,7 +17,8 @@ This project delivers a **Unified Data Platform** that:
 
 ## Documentation
 
-[Click here to view the full Architecture Decision Records & Documentation](https://poshlovesdata.github.io/core-telecoms-data-infrastructure/)
+- [Architecture Decision Records](https://poshlovesdata.github.io/core-telecoms-data-infrastructure/) (Full Documentation Site)
+- [Management Presentation](https://gamma.app/docs/CoreTelecoms-Presentation-ehc29r49ddlllp3?mode=doc) (Slide Deck)
 
 ### Architecture Decision Records (ADRs)
 

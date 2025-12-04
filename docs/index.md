@@ -31,6 +31,10 @@ Sources -> Ingestion (Airflow) -> Data Lake (S3) -> Warehouse (Snowflake) -> Tra
 - **Load:** Parquet files are loaded into Snowflake RAW tables via COPY INTO.
 - **Transform:** dbt models clean (Bronze), join (Silver), and aggregate (Gold) data.
 
+## Documentation
+
+- [Management Presentation](https://gamma.app/docs/CoreTelecoms-Presentation-ehc29r49ddlllp3?mode=doc) (Slide Deck)
+
 ### Architecture Decision Records (ADRs)
 
 Explore the detailed engineering decisions behind this platform:
