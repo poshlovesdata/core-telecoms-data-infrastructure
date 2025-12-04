@@ -15,10 +15,6 @@ This project delivers a **Unified Data Platform** that:
 
 **Business Impact:** Reduces report generation time from days to minutes, providing a single source of truth for Customer Success teams.
 
-## Documentation
-
-[Click here to view the full Architecture Decision Records & Documentation](https://poshlovesdata.github.io/core-telecoms-data-infrastructure/)
-
 ## Architecture
 
 ![Core Telecoms Architecture](./images/core-telecoms-dark.drawio.png)
