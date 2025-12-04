@@ -62,3 +62,35 @@ resource "aws_s3_bucket_public_access_block" "lake_block" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
+
+resource "aws_s3_bucket_lifecycle_configuration" "lake_lifecycle" {
+  bucket = aws_s3_bucket.data_lake.id
+
+  rule {
+    id     = "archive-old-data"
+    status = "Enabled"
+
+    # Move to Infrequent Access after 30 days (Save ~40%)
+    transition {
+      days          = 30
+      storage_class = "STANDARD_IA"
+    }
+
+    # Move to Glacier (Cold Storage) after 90 days (Save ~80%)
+    transition {
+      days          = 90
+      storage_class = "GLACIER_IR" # Instant Retrieval
+    }
+
+    # Delete non-current versions after 7 days (Cleanup for versioning)
+    # This prevents the bucket from bloating with "deleted" files if you overwrite often
+    noncurrent_version_expiration {
+      noncurrent_days = 7
+    }
+
+    # Delete everything after 1 year
+    expiration {
+      days = 365
+    }
+  }
+}

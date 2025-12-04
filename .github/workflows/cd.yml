@@ -9,7 +9,7 @@ permissions:
   packages: write # Required if pushing to GHCR
 
 jobs:
-  # Job 1: Build and Push Docker Image
+  # Build and Push Docker Image
   build-and-push:
     runs-on: ubuntu-latest
     steps:

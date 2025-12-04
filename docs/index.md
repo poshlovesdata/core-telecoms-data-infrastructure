@@ -15,14 +15,20 @@ This project delivers a **Unified Data Platform** that:
 
 **Business Impact:** Reduces report generation time from days to minutes, providing a single source of truth for Customer Success teams.
 
+## Documentation
+
+[Click here to view the full Architecture Decision Records & Documentation](https://poshlovesdata.github.io/core-telecoms-data-infrastructure/)
+
 ## Architecture
+
+![Core Telecoms Architecture](./images/core-telecoms-dark.drawio.png)
 
 The platform follows a **Lakehouse Architecture**, decoupling storage (S3) from compute (Snowflake) for scalability and cost efficiency.
 
 ### High-Level Data Flow
 
 ```
-Sources ➡️ Ingestion (Airflow) ➡️ Data Lake (S3) ➡️ Warehouse (Snowflake) ➡️ Transformation (dbt) ➡️ BI / Analytics
+Sources -> Ingestion (Airflow) -> Data Lake (S3) -> Warehouse (Snowflake) -> Transformation (dbt) -> BI / Analytics
 ```
 
 - **Extract:** Python-based Airflow DAGs pull data from Spreadsheets, APIs, and Databases.
@@ -31,19 +37,21 @@ Sources ➡️ Ingestion (Airflow) ➡️ Data Lake (S3) ➡️ Warehouse (Snowf
 
 ### Live Execution Graph (Event-Driven)
 
+![Alt text](./images/image.png)
+
 This pipeline uses Airflow Assets (Data-Aware Scheduling) instead of brittle time-based dependencies. The Transformation layer only runs once the Snowflake data is confirmed loaded.
 
 ## Tech Stack & Decisions
 
-| Component      | Technology         | Senior Engineering Decision                                                               |
-| -------------- | ------------------ | ----------------------------------------------------------------------------------------- |
-| Infrastructure | Terraform          | Fully modular IaC. S3 Native State Locking for concurrency safety. Zero-click deployment. |
-| Orchestration  | Apache Airflow 3.0 | Adopted v3.0 (API Server architecture). LocalExecutor for efficient resource usage.       |
-| Data Lake      | AWS S3 (Parquet)   | Schema-on-Write via PyArrow. Snappy compression reduces storage costs ~60%.               |
-| Warehouse      | Snowflake          | Separation of storage/compute. Connected via Storage Integrations (no hardcoded keys).    |
-| Transformation | dbt Core           | Medallion Architecture (Bronze/Silver/Gold). Outputs: Star Schema + One Big Table (OBT).  |
-| Observability  | Slack Integration  | Real-time failure alerts via Airflow on_failure_callback.                                 |
-| CI/CD          | GitHub Actions     | Quality Gates: ruff, terraform validate, dbt parse on PR. Docker build/push on merge.     |
+| Component      | Technology         | Senior Engineering Decision                                                                                                                                                                                              |
+| -------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Infrastructure | Terraform          | Fully modular IaC. S3 Native State Locking for concurrency safety. Zero-click deployment.                                                                                                                                |
+| Orchestration  | Apache Airflow 3.0 | Adopted v3.0 (API Server architecture). LocalExecutor for efficient resource usage. Implemented Data-Aware Scheduling (Assets) for event-driven dependencies (Ingest -> Load -> Transform), eliminating race conditions. |
+| Data Lake      | AWS S3 (Parquet)   | Schema-on-Write via PyArrow. Snappy compression reduces storage costs ~60%. Lifecycle Policies enabled for auto-archiving.                                                                                               |
+| Warehouse      | Snowflake          | Separation of storage/compute. Connected via Storage Integrations (no hardcoded keys).                                                                                                                                   |
+| Transformation | dbt Core           | Medallion Architecture (Bronze/Silver/Gold). Outputs: Star Schema + One Big Table (OBT).                                                                                                                                 |
+| Observability  | Slack Integration  | Real-time failure alerts sent to Slack channels via Airflow callbacks (on_failure_callback).on_failure_callback.                                                                                                         |
+| CI/CD          | GitHub Actions     | Automated Quality Gates: `ruff` (Python), `terraform validate`, and `dbt parse` on every PR. Docker build/push on merge.                                                                                                 |
 
 ## Project Structure
 
@@ -72,6 +80,7 @@ This pipeline uses Airflow Assets (Data-Aware Scheduling) instead of brittle tim
 - Docker & Docker Compose
 - AWS Account (Free Tier friendly)
 - Snowflake Account (Standard Edition)
+- Google Cloud Project (with Sheets API enabled)
 - Terraform CLI (v1.5+)
 - Slack Workspace (for alerts)
 
@@ -84,6 +93,16 @@ terraform apply -var="snowflake_account_arn=..."
 # See docs/006 for Snowflake handshake steps
 ```
 
+### 2. Configure Data Warehouse
+
+Run the SQL scripts to initialize Snowflake RBAC, Warehouses, and Storage Integrations.
+
+1. Account Setup: Run `scripts/snowflake/01_snowflake_setup.sql` as ACCOUNTADMIN.
+
+2. Raw Layer & Handshake: Run `scripts/snowflake/02_setup_raw_layer.sql`.
+
+- Note: Ensure you update the STORAGE_AWS_ROLE_ARN with the output from Terraform.
+
 ### 2. Configure Local Environment
 
 Create `.env` in `airflow/`:
@@ -91,6 +110,8 @@ Create `.env` in `airflow/`:
 ```
 AWS_ACCESS_KEY_ID=AKIA...
 AWS_SECRET_ACCESS_KEY=...
+AWS_DEFAULT_REGION=..
+GOOGLE_SHEET_ID=..
 AIRFLOW_CONN_SNOWFLAKE_DEFAULT=snowflake://...
 AIRFLOW_CONN_SLACK_DEFAULT=slack://xoxb-your-token...
 ```
@@ -116,6 +137,8 @@ Access Airflow UI at `http://localhost:8080` (User: admin / Pass: airflow)
 - **Identity:** Hybrid Identity Model: IAM Roles for Production, IAM Users for Local Dev.
 - **Secrets:** Zero secrets in Git; all credentials via Environment Variables or AWS SSM Parameter Store.
 - **Metadata:** `_ingested_at` and `_loaded_at` timestamps for full lineage traceability.
+- **FinOps:** Lifecycle Rules automatically transition data to Infrequent Access (30 days) and Glacier (90 days) to optimize long-term storage costs.
+- **Resilience:** Pipeline enables catchup=True to automatically backfill historical data from the source inception date, ensuring no gaps in data coverage.
 
 ## Data Quality (dbt Tests)
 
@@ -128,12 +151,12 @@ Pipeline enforces strict data contracts:
 Run tests manually:
 
 ```bash
-docker exec -it airflow-scheduler bash -c "cd dbt && dbt test"
+docker exec -it airflow-apiserver bash -c "cd dbt && dbt test"
 ```
 
 ## Author
 
 **Oluwapelumi Oshundiya** – Data Platform Engineer
-LinkedIn | Portfolio
+[LinkedIn](www.linkedin.com/poshlovesdata)
 
 _Built as a Capstone Project demonstrating Data Engineering competencies._
