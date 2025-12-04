@@ -38,6 +38,20 @@ The priority was to balance **Production-Grade Security** with **Cost Optimizati
 
 - **Result:** Data Lake is inaccessible from the public internet, ensuring compliance with data privacy standards.
 
+### E. FinOps: Storage Lifecycle Management
+
+- **Context:** Data accumulates over time, increasing storage costs. Most analytics queries target recent data ("Hot"), while older data is rarely accessed ("Cold").
+
+- **Decision:** Implemented an S3 Lifecycle Policy via Terraform.
+
+  - Transition to Standard-IA: After 30 days (Save ~40%).
+
+  - Transition to Glacier IR: After 90 days (Save ~80%).
+
+  - Cleanup: Delete non-current versions (ghost files) after 7 days.
+
+- **Justification:** Automates cost optimization without manual intervention. Ensures the platform remains cost-effective as data volume grows, aligning with enterprise FinOps best practices.
+
 ## 3. Naming Conventions & Tagging
 
 - **Resource Pattern:** `cde-[project]-[resource]`
