@@ -16,6 +16,8 @@ The priority was to balance **Production-Grade Security** with **Cost Optimizati
 
 ### B. The "Zero-Cost" Network Architecture
 
+![vpc](../images/vpc.png)
+
 - **Context:** A standard enterprise VPC uses NAT Gateways in private subnets to allow outbound internet access.
 - **Constraint:** NAT Gateways cost ~$32/month per Availability Zone.
 - **Decision:** Deployed a standard VPC (Public/Private subnets) but disabled NAT Gateways.
@@ -24,11 +26,15 @@ The priority was to balance **Production-Grade Security** with **Cost Optimizati
 
 ### C. Modern State Management (Locking)
 
+![S3 buckets config](../images/s3_statefile.png)
+
 - **Context:** Terraform requires a lock to prevent concurrent infrastructure modifications that can corrupt the state file.
 - **Decision:** Leveraged S3 Native Locking (`use_lockfile = true`) instead of the legacy DynamoDB approach.
 - **Justification:** Utilizes strong consistency features released by AWS in 2024/2025, simplifying the infrastructure stack and maintaining safety.
 
 ### D. Data Lake Security (The "Iron Dome")
+
+![S3 buckets config](../images/s3_buckets_console.png)
 
 - **Decision:** Enforced Server-Side Encryption (SSE-S3) and Public Access Blocks on all S3 buckets.
 - **Justification:** "Secure by Default." Even in a demo environment, data leaks are unacceptable.

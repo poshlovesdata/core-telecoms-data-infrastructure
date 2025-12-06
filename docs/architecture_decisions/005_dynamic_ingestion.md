@@ -40,6 +40,10 @@ The goal of Day 5 was to implement the **Incremental Extraction layer**. Unlike 
   - **Pre-Flight Check:** Query `information_schema.tables` to ensure table exists.
   - **Soft Fail:** Missing tables log a warning and skip (Success state), handling late-arriving data gracefully.
 
+View code: [02_ingest_daily_postgres.py](https://github.com/poshlovesdata/core-telecoms-data-infrastructure/blob/main/airflow/dags/02_ingest_daily_postgres.py)
+
+![Postgres](../images/dynamic_ingestion_1.png)
+
 ### D. S3 Extraction Pattern
 
 - **Challenge:** Source logs stored as daily CSV/JSON files.
@@ -50,6 +54,10 @@ The goal of Day 5 was to implement the **Incremental Extraction layer**. Unlike 
 
     - Streaming via `obj['Body']` for smaller files (<300MB) to reduce I/O latency.
     - Leveraged reusable `S3Ingestor` for schema hygiene (sanitized column names) and metadata injection (`_ingested_at`).
+
+View code: [02_ingest_daily_postgres.py](https://github.com/poshlovesdata/core-telecoms-data-infrastructure/blob/main/airflow/dags/03_ingest_daily_s3_sources.py)
+
+![S3](../images/dynamic_ingestion_1.png)
 
 ### E. Partitioning Strategy
 
