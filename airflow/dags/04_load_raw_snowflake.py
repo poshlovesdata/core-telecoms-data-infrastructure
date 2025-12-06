@@ -75,7 +75,7 @@ def load_raw_data():
             USE DATABASE core_telecom;
             USE SCHEMA raw;
             COPY INTO web_forms
-            FROM @raw.coretelecom_s3_stage/web_forms/{{ logical_date.strftime('%Y') }}/{{ logical_date.strftime('%m') }}/{{ logical_date.strftime('%d') }}/
+            FROM @raw.coretelecom_s3_stage/web_forms/{{ run_id.split('__')[1][:10].replace('-', '/') }}/
             FILE_FORMAT = (FORMAT_NAME = 'parquet_format')
             MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE
             ON_ERROR = CONTINUE;
@@ -92,7 +92,7 @@ def load_raw_data():
             USE DATABASE core_telecom;
             USE SCHEMA raw;
             COPY INTO call_logs
-            FROM @raw.coretelecom_s3_stage/call_logs/{{ logical_date.strftime('%Y') }}/{{ logical_date.strftime('%m') }}/{{ logical_date.strftime('%d') }}/
+            FROM @raw.coretelecom_s3_stage/call_logs/{{ run_id.split('__')[1][:10].replace('-', '/') }}/
             FILE_FORMAT = (FORMAT_NAME = 'parquet_format')
             MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE
             ON_ERROR = CONTINUE;
@@ -109,7 +109,7 @@ def load_raw_data():
             USE DATABASE core_telecom;
             USE SCHEMA raw;
             COPY INTO social_media
-            FROM @raw.coretelecom_s3_stage/social_media/{{ logical_date.strftime('%Y') }}/{{ logical_date.strftime('%m') }}/{{ logical_date.strftime('%d') }}/
+            FROM @raw.coretelecom_s3_stage/social_media/{{ run_id.split('__')[1][:10].replace('-', '/') }}/
             FILE_FORMAT = (FORMAT_NAME = 'parquet_format')
             MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE
             ON_ERROR = CONTINUE;

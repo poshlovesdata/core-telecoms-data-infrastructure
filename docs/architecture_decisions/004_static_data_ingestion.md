@@ -8,6 +8,7 @@ The goal of Day 4 was to implement the **Extract & Load (EL)** pipeline for stat
 - **Customer Data:** From a messy CSV in an external S3 bucket.
 
 The solution enforces a **Schema-On-Write** approach, converting all raw inputs into standardized, compressed Parquet files in the S3 Raw Zone.
+![Airflow alerts](../images/s3_ingestion.png)
 
 ## 2. Key Design Decisions
 
@@ -19,6 +20,8 @@ The solution enforces a **Schema-On-Write** approach, converting all raw inputs 
 
   - **DRY Principle:** Prevents code duplication across DAGs.
   - **Standardization:** Enforces uniform Parquet settings (`Snappy` compression, PyArrow engine) and metadata injection (`_ingested_at`) for all files.
+
+View code here : [s3_utils.py](https://github.com/poshlovesdata/core-telecoms-data-infrastructure/blob/main/airflow/dags/common/s3_utils.py)
 
 ### B. Performance Strategy: PyArrow with Fallback
 

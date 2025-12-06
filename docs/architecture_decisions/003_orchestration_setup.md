@@ -28,6 +28,8 @@ The architecture prioritizes **Developer Experience (DevEx)** and **Resource Eff
   - **Simplicity:** Tasks run as subprocesses on the scheduler/machine.
   - **Parity:** Sufficient parallelism for non-distributed capstone workload.
 
+View the configuration here: [docker-compose.yaml](https://github.com/poshlovesdata/core-telecoms-data-infrastructure/blob/main/airflow/docker-compose.yaml)
+
 ### C. Hybrid Cloud Authentication
 
 - **Context:** Airflow container needs authentication with AWS S3 and Google Cloud (Sheets API).
@@ -45,6 +47,8 @@ The architecture prioritizes **Developer Experience (DevEx)** and **Resource Eff
 - **Challenge:** Using time-based scheduling (e.g., all DAGs running `@daily` at 7 AM) creates race conditions. If Ingestion is slow, the Loading DAG might start processing empty/old data.
 
 - **Decision:** Implemented Data-Aware Scheduling (Airflow Assets).
+
+![Event driven dags](../images/event_driven_airflow.png)
 
 - **Mechanism:**
 
@@ -65,6 +69,8 @@ The architecture prioritizes **Developer Experience (DevEx)** and **Resource Eff
   - **Slack Webhook:** Instant, team-centric, simpler authentication via tokens.
 
   - **Decision:** Selected Slack Integration via `on_failure_callback`.
+
+![Airflow alerts](../images/slack_airflow_alert.png)
 
 - **Implementation:**
 

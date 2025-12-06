@@ -2,7 +2,7 @@ name: CD Pipeline
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
 
 permissions:
   contents: write # Required for pushing to gh-pages branch
@@ -10,40 +10,80 @@ permissions:
 
 jobs:
   # Build and Push Docker Image
+  # Only runs if files in 'airflow/' change
   build-and-push:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
+      # Check if airflow folder changed
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            airflow:
+              - 'airflow/**'
+
       - name: Login to Docker Hub
+        if: steps.changes.outputs.airflow == 'true'
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Set up Docker Buildx
+        if: steps.changes.outputs.airflow == 'true'
         uses: docker/setup-buildx-action@v2
 
       - name: Build and push
+        if: steps.changes.outputs.airflow == 'true'
         uses: docker/build-push-action@v4
         with:
           context: ./airflow
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/cde-capstone-airflow:latest,${{ secrets.DOCKERHUB_USERNAME }}/cde-capstone-airflow:${{ github.sha }}
 
+  # Deploy Documentation & dbt Lineage
   deploy-docs:
     runs-on: ubuntu-latest
-    # needs: build-and-push
+    env:
+      # Secrets required for 'dbt docs generate' to read schema from Snowflake
+      SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+      SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+      SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+      SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+      SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+      SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+      SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
+      # Tell dbt where to find profiles.yml (run from project root)
+      DBT_PROFILES_DIR: .
     steps:
       - uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
+          python-version: '3.10'
 
-      - name: Install MkDocs
-        run: pip install mkdocs-material
+      - name: Install Dependencies
+        run: |
+          pip install mkdocs-material dbt-snowflake
+
+      - name: Generate dbt Docs
+        run: |
+          cd airflow/dbt
+          dbt deps
+          dbt docs generate
+
+      - name: Embed dbt Docs into MkDocs
+        run: |
+          # Create a folder for dbt inside the docs structure
+          mkdir -p docs/dbt
+
+          # Copy the generated site files (index.html, manifest.json, etc.)
+          cp airflow/dbt/target/index.html docs/dbt/
+          cp airflow/dbt/target/*.json docs/dbt/
+          cp airflow/dbt/target/graph.gpickle docs/dbt/ || true
 
       - name: Deploy to GitHub Pages
         run: mkdocs gh-deploy --force

@@ -29,6 +29,8 @@ The goal of Day 2 was to provision the Data Warehouse (Compute) and establish th
 
 - **Impact:** Guarantees environment parity; code working locally ensures production functionality.
 
+View the configuration here: [iam.tf](https://github.com/poshlovesdata/core-telecoms-data-infrastructure/blob/main/terraform/iam.tf)
+
 ### C. Secrets Management: SSM vs. Secrets Manager
 
 - **Context:** Airflow needs to store Snowflake password and database credentials securely.
@@ -43,14 +45,18 @@ The goal of Day 2 was to provision the Data Warehouse (Compute) and establish th
     - Actual secret updated manually in Console.
     - Terraform ignores drift (`lifecycle { ignore_changes = [value] }`) preventing overwrites.
 
+  View the configuration here: [ssm.tf](https://github.com/poshlovesdata/core-telecoms-data-infrastructure/blob/main/terraform/ssm.tf)
+
 ## 3. Security & Governance
 
 - **IAM Least Privilege Scope:**
 
-  - **S3:** `GetObject`, `PutObject`, `ListBucket` only on `cde-*-raw` and `cde-*-curated` buckets.
+  - **S3:** `GetObject`, `PutObject`, `ListBucket` only on `core-telecoms-data-lake` bucket.
   - **SSM:** `GetParameter` only on paths starting with `/core_telecoms/*`.
 
 - **Result:** Even if Airflow credentials were compromised, attackers cannot spin up EC2 instances or delete unrelated infrastructure.
+
+View the configuration here: [iam.tf](https://github.com/poshlovesdata/core-telecoms-data-infrastructure/blob/main/terraform/iam.tf)
 
 ## 4. Technical Trade-Off Analysis
 

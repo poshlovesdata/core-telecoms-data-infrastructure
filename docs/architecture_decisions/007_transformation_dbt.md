@@ -6,6 +6,8 @@ The goal of Day 7 was to implement the **Transformation layer (T in ELT)**. I in
 
 The solution adopts a **Medallion Architecture (Bronze/Silver/Gold)** to separate technical hygiene from business logic, culminating in both a **Star Schema** and a **One Big Table (OBT)** to serve diverse analytical needs.
 
+![](../images/dbt_lineage.png)
+
 ## 2. Key Design Decisions
 
 ### A. Architecture: Medallion Schema (Bronze → Silver → Gold)
