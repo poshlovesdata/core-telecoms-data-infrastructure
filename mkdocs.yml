@@ -26,6 +26,7 @@ theme:
 
 nav:
   - Home: index.md
+  - Data Lineage (dbt): dbt/index.html
   - Architecture Decisions:
       - 001 - Infrastructure: architecture_decisions/001_infrastructure_setup.md
       - 002 - Compute & Security: architecture_decisions/002_compute_and_security.md
