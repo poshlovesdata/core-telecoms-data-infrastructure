@@ -35,6 +35,8 @@ Sources -> Ingestion (Airflow) -> Data Lake (S3) -> Warehouse (Snowflake) -> Tra
 
 - [Management Presentation](https://gamma.app/docs/CoreTelecoms-Presentation-ehc29r49ddlllp3?mode=doc) (Slide Deck)
 
+- [Data Lineage/Documentation](https://poshlovesdata.github.io/core-telecoms-data-infrastructure/dbt/#!/overview)
+
 ### Architecture Decision Records (ADRs)
 
 Explore the detailed engineering decisions behind this platform:
