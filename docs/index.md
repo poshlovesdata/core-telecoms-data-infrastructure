@@ -33,7 +33,7 @@ Sources -> Ingestion (Airflow) -> Data Lake (S3) -> Warehouse (Snowflake) -> Tra
 
 ## Documentation
 
-- [Management Presentation](https://gamma.app/docs/CoreTelecoms-Presentation-ehc29r49ddlllp3?mode=doc) (Slide Deck)
+- [Management Presentation](https://gamma.app/docs/Core-Telecoms-Modernising-the-Customer-Data-Platform-mtp7secqxlvh06o) (Slide Deck)
 
 - [Data Lineage/Documentation](https://poshlovesdata.github.io/core-telecoms-data-infrastructure/dbt/#!/overview)
 
@@ -65,7 +65,7 @@ This pipeline uses Airflow Assets (Data-Aware Scheduling) instead of brittle tim
 
 ## Tech Stack & Decisions
 
-| Component      | Technology         | Senior Engineering Decision                                                                                                                                                                                              |
+| Component      | Technology         | Engineering Decision                                                                                                                                                                                                     |
 | -------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Infrastructure | Terraform          | Fully modular IaC. S3 Native State Locking for concurrency safety. Zero-click deployment.                                                                                                                                |
 | Orchestration  | Apache Airflow 3.0 | Adopted v3.0 (API Server architecture). LocalExecutor for efficient resource usage. Implemented Data-Aware Scheduling (Assets) for event-driven dependencies (Ingest -> Load -> Transform), eliminating race conditions. |
