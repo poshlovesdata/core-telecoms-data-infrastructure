@@ -178,6 +178,6 @@ docker exec -it airflow-apiserver bash -c "cd dbt && dbt test"
 ## Author
 
 **Oluwapelumi Oshundiya** – Data Platform Engineer
-[LinkedIn](www.linkedin.com/poshlovesdata)
+[LinkedIn](www.linkedin.com/in/poshlovesdata)
 
 _Built as a Capstone Project demonstrating Data Engineering competencies._
